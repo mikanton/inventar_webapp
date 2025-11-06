@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin – Inventar</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100 text-gray-900">
+
+  <!-- Header -->
+  <header class="bg-indigo-600 text-white p-4 text-center text-xl font-bold">
+    📊 Admin Dashboard
+  </header>
+
+  <!-- Tabs -->
+  <div class="flex justify-around bg-white shadow p-2 sticky top-0">
+    <button class="tab-btn px-4 py-2 font-semibold" onclick="showTab('changelog')">Changelog</button>
+    <button class="tab-btn px-4 py-2 font-semibold" onclick="showTab('users')">Benutzer</button>
+    <button class="tab-btn px-4 py-2 font-semibold" onclick="showTab('analytics')">Analytics</button>
+  </div>
+
+  <!-- Content -->
+  <main class="p-4 space-y-6">
+
+    <!-- Changelog -->
+    <section id="tab-changelog" class="hidden">
+      <h2 class="text-lg font-bold mb-2">📜 Änderungen</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white rounded shadow">
+          <thead>
+            <tr class="bg-gray-200 text-left">
+              <th class="px-2 py-1">Zeit</th>
+              <th class="px-2 py-1">User</th>
+              <th class="px-2 py-1">Aktion</th>
+              <th class="px-2 py-1">Artikel</th>
+              <th class="px-2 py-1">Alt</th>
+              <th class="px-2 py-1">Neu</th>
+            </tr>
+          </thead>
+          <tbody id="changelogTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Users -->
+    <section id="tab-users" class="hidden">
+      <h2 class="text-lg font-bold mb-2">👥 Benutzer</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white rounded shadow">
+          <thead>
+            <tr class="bg-gray-200 text-left">
+              <th class="px-2 py-1">User</th>
+              <th class="px-2 py-1">Rolle</th>
+              <th class="px-2 py-1">Letzter Login</th>
+              <th class="px-2 py-1">Aktionen</th>
+            </tr>
+          </thead>
+          <tbody id="usersTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Analytics -->
+    <section id="tab-analytics" class="hidden">
+      <h2 class="text-lg font-bold mb-2">📈 Analytics</h2>
+      <canvas id="actionsChart" class="bg-white p-2 rounded shadow"></canvas>
+    </section>
+
+  </main>
+
+  <script>
+    // Tabs anzeigen
+    function showTab(tab) {
+      document.querySelectorAll("section").forEach(s => s.classList.add("hidden"));
+      document.getElementById("tab-" + tab).classList.remove("hidden");
+    }
+    showTab('changelog'); // Start mit Changelog
+
+    // Changelog laden
+    async function loadChangelog() {
+      let res = await fetch("get_changelog.php");
+      let data = await res.json();
+      let table = document.getElementById("changelogTable");
+      table.innerHTML = "";
+      data.slice().reverse().forEach(entry => {
+        let row = `<tr class="border-b">
+          <td class="px-2 py-1">${new Date(entry.timestamp).toLocaleString()}</td>
+          <td class="px-2 py-1">${entry.user}</td>
+          <td class="px-2 py-1">${entry.action}</td>
+          <td class="px-2 py-1">${entry.item}</td>
+          <td class="px-2 py-1">${entry.old_value ?? "-"}</td>
+          <td class="px-2 py-1">${entry.new_value}</td>
+        </tr>`;
+        table.innerHTML += row;
+      });
+    }
+
+    // Users laden
+    async function loadUsers() {
+      let res = await fetch("get_users.php");
+      let data = await res.json();
+      let table = document.getElementById("usersTable");
+      table.innerHTML = "";
+      data.forEach(user => {
+        let row = `<tr class="border-b">
+          <td class="px-2 py-1">${user.username}</td>
+          <td class="px-2 py-1">${user.role}</td>
+          <td class="px-2 py-1">${new Date(user.last_login).toLocaleString()}</td>
+          <td class="px-2 py-1">${user.actions}</td>
+        </tr>`;
+        table.innerHTML += row;
+      });
+      drawChart(data);
+    }
+
+    // Chart für Aktionen pro User
+    function drawChart(users) {
+      let ctx = document.getElementById("actionsChart").getContext("2d");
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: users.map(u => u.username),
+          datasets: [{
+            label: "Anzahl Aktionen",
+            data: users.map(u => u.actions),
+            backgroundColor: "rgba(99, 102, 241, 0.6)"
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+    // Regelmäßig aktualisieren
+    setInterval(() => {
+      loadChangelog();
+      loadUsers();
+    }, 5000);
+
+    loadChangelog();
+    loadUsers();
+  </script>
+</body>
+</html>

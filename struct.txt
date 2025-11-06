@@ -1,0 +1,11 @@
+/var/www/html/inventar_webapp/
+├── index.php
+├── admin.php
+├── api.php
+├── sse.php
+├── presence.php
+├── util.php
+├── style.css
+├── inventar.json      # deine bestehende Datei (Map)
+├── log.json           # wird automatisch angelegt
+└── presence.json      # wird automatisch angelegt

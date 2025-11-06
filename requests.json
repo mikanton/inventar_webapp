@@ -1,0 +1,94 @@
+[
+    {
+        "id": "fbcc3bf9b3a66e9a",
+        "location": "Heiterkeit zu Freitag",
+        "items": [
+            {
+                "name": "Eiswürfel",
+                "qty": 2
+            }
+        ],
+        "created": "2025-09-02T07:09:21+00:00",
+        "status": "fulfilled",
+        "fulfilled_at": "2025-09-06T06:12:14+00:00",
+        "fulfilled_by": null
+    },
+    {
+        "id": "3cf6ae25ee8125b3",
+        "location": "Heiterkeit",
+        "items": [
+            {
+                "name": "Sprüh­sahne",
+                "qty": 2
+            },
+            {
+                "name": "Gin Gordon's London Dry",
+                "qty": 2
+            },
+            {
+                "name": "Berliner Luft",
+                "qty": 2
+            },
+            {
+                "name": "Aperol",
+                "qty": 4
+            },
+            {
+                "name": "Klopfer / Shots",
+                "qty": 2
+            },
+            {
+                "name": "Kümmerling",
+                "qty": 2
+            },
+            {
+                "name": "Jägermeister",
+                "qty": 2
+            },
+            {
+                "name": "Vanille-Eis (2,5 Liter)",
+                "qty": 2
+            },
+            {
+                "name": "Jack Daniels",
+                "qty": 2
+            },
+            {
+                "name": "Ballantine's Finest Whiskey",
+                "qty": 2
+            }
+        ],
+        "created": "2025-09-02T07:08:47+00:00",
+        "status": "fulfilled",
+        "fulfilled_at": "2025-09-06T06:12:19+00:00",
+        "fulfilled_by": null
+    },
+    {
+        "id": "8c43827262a05e1b",
+        "location": "Wappen",
+        "items": [
+            {
+                "name": "Absolut Wodka",
+                "qty": 5
+            }
+        ],
+        "created": "2025-08-29T22:15:10+00:00",
+        "status": "deleted",
+        "fulfilled_at": "2025-08-29T22:15:21+00:00",
+        "fulfilled_by": null,
+        "deleted_at": "2025-09-01T14:23:40+00:00"
+    },
+    {
+        "id": "6e9b2e66a239ea5a",
+        "location": "Heiterkeit",
+        "items": [
+            {
+                "name": "Eiswürfel",
+                "qty": 2
+            }
+        ],
+        "created": "2025-08-29T22:14:18+00:00",
+        "status": "deleted",
+        "deleted_at": "2025-08-29T22:14:39+00:00"
+    }
+]
