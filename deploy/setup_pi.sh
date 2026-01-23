@@ -32,6 +32,13 @@ echo -e "${GREEN}>>> Configuring Nginx...${NC}"
 # Copy config
 # Copy config
 cp "$SCRIPT_DIR/nginx.conf" /etc/nginx/sites-available/inventar
+
+# FIX: Disable default site to prevent Port 80 conflicts (e.g. if Apache is running)
+if [ -L /etc/nginx/sites-enabled/default ]; then
+    echo "Disabling default Nginx site to avoid Port 80 conflicts..."
+    unlink /etc/nginx/sites-enabled/default
+fi
+
 # Link new config
 ln -sf /etc/nginx/sites-available/inventar /etc/nginx/sites-enabled/
 
