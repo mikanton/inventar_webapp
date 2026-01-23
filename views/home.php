@@ -21,7 +21,7 @@ ob_start();
 <div id="list" class="list"></div>
 
 <script>
-    const IS_ADMIN = <?php echo Auth::isLoggedIn() || Auth::DEV_MODE ? 'true' : 'false'; ?>;
+    const IS_ADMIN = <?php echo Auth::isLoggedIn() ? 'true' : 'false'; ?>;
 </script>
 <script src="assets/js/scanner.js"></script>
 

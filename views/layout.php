@@ -19,11 +19,6 @@
     <header class="topbar">
         <div class="brand">
             Inventar
-            <?php if (Auth::DEV_MODE): ?>
-                <span
-                    style="font-size: 10px; background: #ff9800; color: #000; padding: 2px 6px; border-radius: 4px; margin-left: 8px; vertical-align: middle;">DEV
-                    MODE</span>
-            <?php endif; ?>
         </div>
         <div class="spacer"></div>
 
