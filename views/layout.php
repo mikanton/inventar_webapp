@@ -61,7 +61,12 @@
             <a href="index.php" class="<?= $router->is('home') ? 'active' : '' ?>">Liste</a>
             <a href="#" data-trigger="modalRequest">Neue Request</a>
             <a href="#" data-trigger="modalSupplier">Lieferanten / Pickliste</a>
-            <a href="index.php?route=admin" class="<?= $router->is('admin') ? 'active' : '' ?>">Admin</a>
+            <a href="#" data-trigger="modalSupplier">Lieferanten / Pickliste</a>
+            
+            <?php if (Auth::isAdmin()): ?>
+                <a href="index.php?route=admin" class="<?= $router->is('admin') ? 'active' : '' ?>">Admin</a>
+            <?php endif; ?>
+
             <a href="index.php?route=status" class="<?= $router->is('status') ? 'active' : '' ?>" target="_blank">Status
                 Monitor ⬈</a>
 
