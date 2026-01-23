@@ -49,6 +49,11 @@ $router->add('GET', 'logout', function () {
   header('Location: index.php');
 });
 
+// Status
+$router->add('GET', 'status', function () {
+  require __DIR__ . '/views/status.php';
+});
+
 // Admin
 $router->add('GET', 'admin', function () use ($router) {
   require __DIR__ . '/views/admin.php';

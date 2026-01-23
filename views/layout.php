@@ -67,6 +67,8 @@
             <a href="#" data-trigger="modalRequest">Neue Request</a>
             <a href="#" data-trigger="modalSupplier">Lieferanten / Pickliste</a>
             <a href="index.php?route=admin" class="<?= $router->is('admin') ? 'active' : '' ?>">Admin</a>
+            <a href="index.php?route=status" class="<?= $router->is('status') ? 'active' : '' ?>" target="_blank">Status
+                Monitor ⬈</a>
 
             <?php if (Auth::isLoggedIn()): ?>
                 <a href="index.php?route=logout" class="logout">Logout</a>

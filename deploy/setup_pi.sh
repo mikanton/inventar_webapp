@@ -28,7 +28,18 @@ echo -e "${GREEN}>>> Installing Nginx, PHP, and SQLite...${NC}"
 # Install Nginx and PHP ecosystem
 apt-get install -y nginx php-fpm php-sqlite3 php-common php-mbstring php-xml unzip git
 
-echo -e "${GREEN}>>> Configuring Nginx...${NC}"
+echo -e "${GREEN}>>> Configuring Nginx & SSL...${NC}"
+# Generate Self-Signed Cert
+mkdir -p /etc/nginx/ssl
+if [ ! -f /etc/nginx/ssl/inventar.crt ]; then
+    echo "Generating Self-Signed SSL Certificate..."
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+        -keyout /etc/nginx/ssl/inventar.key \
+        -out /etc/nginx/ssl/inventar.crt \
+        -subj "/C=DE/ST=Berlin/L=Berlin/O=HomeLab/OU=Inventory/CN=raspberrypi"
+    chmod 600 /etc/nginx/ssl/inventar.key
+fi
+
 # Copy config
 # Copy config
 cp "$SCRIPT_DIR/nginx.conf" /etc/nginx/sites-available/inventar
@@ -85,8 +96,9 @@ echo -e "${GREEN}>>> Restarting Services...${NC}"
 echo -e "${GREEN}>>> Restarting Services...${NC}"
 # Firewall fix (if ufw or other firewall is active)
 if command -v ufw &> /dev/null; then
-    echo "Opening Port 8081 in UFW..."
+    echo "Opening Port 8081 (HTTP) & 8082 (HTTPS) in UFW..."
     ufw allow 8081/tcp
+    ufw allow 8082/tcp
 fi
 
 # Test Nginx Config first
@@ -98,4 +110,5 @@ echo -e "${GREEN}>>> DONE!${NC}"
 echo "--------------------------------------------------------"
 IP=$(hostname -I | cut -d' ' -f1)
 echo "App is accessible at: http://$IP:8081/"
+echo "Secure App (Scanner):  https://$IP:8082/ (Accept Warning)"
 echo "--------------------------------------------------------"

@@ -174,6 +174,64 @@ if ($action === 'analytics_productivity') {
     ok(['rebalancing' => $rebalancing, 'consumption' => $consumption, 'distribution' => $distribution]);
 }
 
+if ($action === 'system_stats') {
+    Auth::requireLogin();
+
+    // 1. CPU Load
+    $load = sys_getloadavg();
+
+    // 2. RAM Usage
+    $memInfo = file_get_contents('/proc/meminfo');
+    preg_match('/MemTotal:\s+(\d+) kB/', $memInfo, $matches);
+    $totalMem = $matches[1] ?? 0;
+    preg_match('/MemAvailable:\s+(\d+) kB/', $memInfo, $matches);
+    $availMem = $matches[1] ?? 0;
+    $usedMem = $totalMem - $availMem;
+
+    // 3. Network Traffic
+    $net = file_get_contents('/proc/net/dev');
+    $rx = 0;
+    $tx = 0;
+    // Sum up eth0 and wlan0
+    if (preg_match_all('/(eth0|wlan0|en\d+):\s*(\d+)\s+\d+\s+\d+\s+\d+\s+\d+\s+\d+\s+\d+\s+\d+\s+(\d+)/', $net, $matches)) {
+        foreach ($matches[2] as $k => $r) {
+            $rx += $r;
+            $tx += $matches[3][$k];
+        }
+    }
+
+    // 4. Clients
+    $clients = [];
+    if (file_exists('presence.json')) {
+        $clients = json_decode(file_get_contents('presence.json'), true) ?: [];
+    }
+
+    // 5. Temp (Raspberry Pi specific)
+    $temp = 'N/A';
+    if (file_exists('/sys/class/thermal/thermal_zone0/temp')) {
+        $t = intval(file_get_contents('/sys/class/thermal/thermal_zone0/temp'));
+        $temp = round($t / 1000, 1);
+    }
+
+    ok([
+        'cpu' => [
+            'load' => $load,
+            'temp' => $temp
+        ],
+        'ram' => [
+            'total' => round($totalMem / 1024), // MB
+            'used' => round($usedMem / 1024),
+            'percent' => $totalMem > 0 ? round(($usedMem / $totalMem) * 100) : 0
+        ],
+        'net' => [
+            'rx' => $rx,
+            'tx' => $tx
+        ],
+        'clients' => $clients,
+        'uptime' => trim(shell_exec('uptime -p'))
+    ]);
+}
+
 // CSRF Check for mutating actions
 if (in_array($action, ['add', 'update', 'set', 'delete', 'request_create', 'request_fulfill', 'request_delete'])) {
     $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
