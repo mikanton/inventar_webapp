@@ -83,6 +83,12 @@ sed -i 's/;opcache.memory_consumption=128/opcache.memory_consumption=64/' /etc/p
 
 echo -e "${GREEN}>>> Restarting Services...${NC}"
 echo -e "${GREEN}>>> Restarting Services...${NC}"
+# Firewall fix (if ufw or other firewall is active)
+if command -v ufw &> /dev/null; then
+    echo "Opening Port 8081 in UFW..."
+    ufw allow 8081/tcp
+fi
+
 # Test Nginx Config first
 nginx -t
 systemctl restart php$PHP_VER-fpm
