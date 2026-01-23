@@ -254,6 +254,16 @@ ob_start();
         }
     }
 </style>
+<style>
+    /* Hotfix for tabs */
+    .tabcontent {
+        display: none;
+    }
+
+    .tabcontent.active {
+        display: block;
+    }
+</style>
 
 <?php
 $content = ob_get_clean();

@@ -18,25 +18,28 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function setupTabs() {
-    document.querySelectorAll('.tab').forEach(t => {
-        t.addEventListener('click', () => {
-            // Remove active class from all tabs & content
-            document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-            document.querySelectorAll('.tabcontent').forEach(x => x.classList.remove('active'));
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(t => {
+        t.onclick = (e) => {
+            e.preventDefault();
+            // Deactivate all
+            tabs.forEach(x => x.classList.remove('active'));
+            document.querySelectorAll('.tabcontent').forEach(x => x.style.display = 'none');
 
-            // Activate clicked tab
+            // Activate current
             t.classList.add('active');
             const targetId = 'tab-' + t.dataset.tab;
-            const targetContent = document.getElementById(targetId);
-            if (targetContent) targetContent.classList.add('active');
+            const pane = document.getElementById(targetId);
+            if (pane) pane.style.display = 'block';
 
-            // Load data based on tab
-            const tabName = t.dataset.tab;
-            if (tabName === 'logs') loadLogs();
-            if (tabName === 'users') loadUsers();
-            if (tabName === 'analytics') loadAnalytics();
-        });
+            // Load Data
+            if (t.dataset.tab === 'logs') loadLogs();
+            if (t.dataset.tab === 'users') loadUsers();
+            if (t.dataset.tab === 'analytics') loadAnalytics();
+        };
     });
+    // Trigger first
+    if (tabs.length > 0) tabs[0].click();
 }
 
 function setupListeners() {

@@ -20,6 +20,7 @@ $router->add('GET', 'home', function () use ($router) {
 $router->add('GET', 'change_location', function () {
   Auth::clearLocationSelection();
   header('Location: index.php');
+  exit;
 });
 
 // Login
@@ -42,6 +43,7 @@ $router->add('POST', 'login', function () {
 
   if (Auth::login($username, $password)) {
     header('Location: index.php');
+    exit;
   } else {
     $error = 'Ungültige Zugangsdaten';
     require __DIR__ . '/views/login.php';
@@ -78,6 +80,7 @@ $router->add('POST', 'register', function () {
     // Auto login
     Auth::login($username, $password);
     header('Location: index.php');
+    exit;
   } else {
     $error = 'Benutzername bereits vergeben';
     require __DIR__ . '/views/register.php';
@@ -88,6 +91,7 @@ $router->add('POST', 'register', function () {
 $router->add('GET', 'logout', function () {
   Auth::logout();
   header('Location: index.php');
+  exit;
 });
 
 // Status
