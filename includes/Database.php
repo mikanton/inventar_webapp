@@ -149,6 +149,10 @@ class Database
             $cols = self::$pdo->query("PRAGMA table_info(inventory)")->fetchAll(PDO::FETCH_COLUMN, 1);
             if (!in_array('barcode', $cols)) {
                 self::$pdo->exec("ALTER TABLE inventory ADD COLUMN barcode TEXT");
+                self::$pdo->exec("CREATE INDEX IF NOT EXISTS idx_barcode ON inventory(barcode)");
+            } else {
+                // Ensure index exists even if column was already there
+                self::$pdo->exec("CREATE INDEX IF NOT EXISTS idx_barcode ON inventory(barcode)");
             }
         } catch (Exception $e) {
             error_log("Barcode migration failed: " . $e->getMessage());

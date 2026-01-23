@@ -105,6 +105,26 @@ ob_start();
     </div>
 </section>
 
+<!-- Users -->
+<section id="tab-users" class="panel tabcontent">
+    <div class="row gap" style="margin-bottom: 20px;">
+        <div class="card" style="flex: 1; display: block;">
+            <h3>Neuer Benutzer</h3>
+            <div class="field">
+                <input id="uName" placeholder="Benutzername">
+            </div>
+            <div class="field">
+                <input id="uPass" type="password" placeholder="Passwort">
+            </div>
+            <button id="uAdd" class="btn primary full">Erstellen</button>
+        </div>
+        <div style="flex: 2;">
+            <h3>Benutzerliste</h3>
+            <ul id="userList" class="list"></ul>
+        </div>
+    </div>
+</section>
+
 <style>
     .tabcontent {
         display: none;

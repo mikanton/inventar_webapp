@@ -270,7 +270,16 @@ class Scanner {
                     </div>
                 `;
             } else {
-                this.showLinkSearch(barcode);
+                // Normal User: Show Error instead of Link Search
+                title.textContent = 'Unbekannt';
+                body.innerHTML = `
+                    <div class="overlay-info" style="color: var(--danger)">
+                        <div style="font-size: 3rem; margin-bottom: 10px;">?</div>
+                        <p>Artikel nicht gefunden.</p>
+                        <p style="font-size: 0.9rem; color: var(--text-muted)">Nur Admins können neue Barcodes verknüpfen.</p>
+                        <div class="barcode-display">${barcode}</div>
+                    </div>
+                `;
             }
         }
     }

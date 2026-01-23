@@ -31,6 +31,7 @@ function setupTabs() {
 
             if (target === 'logs') loadLogs();
             if (target === 'analytics') loadAnalytics();
+            if (target === 'users') loadUsers();
         });
     });
 }
@@ -78,6 +79,16 @@ function setupListeners() {
         }
 
         $('#aName').value = ''; $('#aBarcode').value = ''; $('#aQty').value = '0';
+    };
+
+    // User Management
+    $('#uAdd').onclick = async () => {
+        const username = $('#uName').value.trim();
+        const password = $('#uPass').value.trim();
+        if (!username || !password) return alert('Bitte beides ausfüllen');
+        await api('user_create', { username, password });
+        $('#uName').value = ''; $('#uPass').value = '';
+        loadUsers();
     };
 }
 
