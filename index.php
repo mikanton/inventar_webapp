@@ -34,6 +34,11 @@ $router->add('GET', 'login', function () use ($router) {
 $router->add('POST', 'login', function () {
   $username = $_POST['username'] ?? '';
   $password = $_POST['password'] ?? '';
+  $token = $_POST['csrf_token'] ?? '';
+
+  if (!Auth::verifyCsrf($token)) {
+    die("CSRF Validation Failed");
+  }
 
   if (Auth::login($username, $password)) {
     header('Location: index.php');
@@ -56,6 +61,11 @@ $router->add('POST', 'register', function () {
   $username = $_POST['username'] ?? '';
   $password = $_POST['password'] ?? '';
   $confirm = $_POST['password_confirm'] ?? '';
+  $token = $_POST['csrf_token'] ?? '';
+
+  if (!Auth::verifyCsrf($token)) {
+    die("CSRF Validation Failed");
+  }
 
   if ($password !== $confirm) {
     $error = 'Passwörter stimmen nicht überein';

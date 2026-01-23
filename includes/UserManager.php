@@ -8,8 +8,10 @@ class UserManager
         $pdo = Database::connect();
         $hash = password_hash($password, PASSWORD_DEFAULT);
         try {
-            $stmt = $pdo->prepare("INSERT INTO users (username, password_hash) VALUES (?, ?)");
+        try {
+            $stmt = $pdo->prepare("INSERT INTO users (username, password_hash, role) VALUES (?, ?, 'user')");
             $stmt->execute([$username, $hash]);
+            return true;
             return true;
         } catch (PDOException $e) {
             return false; // Likely duplicate username

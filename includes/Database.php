@@ -92,7 +92,7 @@ class Database
         $userCount = self::$pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
         if ($userCount == 0) {
             $hash = password_hash('admin', PASSWORD_DEFAULT);
-            $stmt = self::$pdo->prepare("INSERT INTO users (username, password_hash) VALUES ('admin', ?)");
+            $stmt = self::$pdo->prepare("INSERT INTO users (username, password_hash, role) VALUES ('admin', ?, 'admin')");
             $stmt->execute([$hash]);
         }
 
@@ -156,6 +156,21 @@ class Database
             }
         } catch (Exception $e) {
             error_log("Barcode migration failed: " . $e->getMessage());
+        }
+        } catch (Exception $e) {
+            error_log("Barcode migration failed: " . $e->getMessage());
+        }
+
+        // Check for role column in users
+        try {
+            $cols = self::$pdo->query("PRAGMA table_info(users)")->fetchAll(PDO::FETCH_COLUMN, 1);
+            if (!in_array('role', $cols)) {
+                self::$pdo->exec("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'user'");
+                // Promote admin user if exists
+                self::$pdo->exec("UPDATE users SET role = 'admin' WHERE username = 'admin'");
+            }
+        } catch (Exception $e) {
+            error_log("Role migration failed: " . $e->getMessage());
         }
     }
 

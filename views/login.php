@@ -9,6 +9,7 @@ ob_start();
             <div class="alert error"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
         <form method="post" action="index.php?route=login">
+            <input type="hidden" name="csrf_token" value="<?= Auth::getCsrfToken() ?>">
             <div class="field">
                 <label>Benutzername</label>
                 <input type="text" name="username" required autofocus>

@@ -11,6 +11,7 @@ ob_start();
             </div>
         <?php endif; ?>
         <form method="post" action="index.php?route=register">
+            <input type="hidden" name="csrf_token" value="<?= Auth::getCsrfToken() ?>">
             <div class="field">
                 <label>Benutzername</label>
                 <input type="text" name="username" required autofocus>
