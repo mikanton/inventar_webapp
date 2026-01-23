@@ -35,6 +35,13 @@ cp "$SCRIPT_DIR/nginx.conf" /etc/nginx/sites-available/inventar
 # Link new config
 ln -sf /etc/nginx/sites-available/inventar /etc/nginx/sites-enabled/
 
+# FIX: Patch Nginx config to use the correct PHP socket version
+# Find PHP version again (or reuse variable if moved up)
+PHP_VER=$(php -r "echo PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;")
+echo "Detected PHP $PHP_VER"
+# Replace generic socket with versioned socket
+sed -i "s/php-fpm.sock/php$PHP_VER-fpm.sock/g" /etc/nginx/sites-available/inventar
+
 echo -e "${GREEN}>>> Setting up Application Directory...${NC}"
 # Create destination if not exists
 mkdir -p $DEST_DIR
@@ -68,6 +75,9 @@ sed -i 's/;opcache.enable=1/opcache.enable=1/' /etc/php/$PHP_VER/fpm/php.ini
 sed -i 's/;opcache.memory_consumption=128/opcache.memory_consumption=64/' /etc/php/$PHP_VER/fpm/php.ini
 
 echo -e "${GREEN}>>> Restarting Services...${NC}"
+echo -e "${GREEN}>>> Restarting Services...${NC}"
+# Test Nginx Config first
+nginx -t
 systemctl restart php$PHP_VER-fpm
 systemctl restart nginx
 
