@@ -16,7 +16,10 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 DEST_DIR="/var/www/html/inventar-webapp"
-CURRENT_DIR=$(pwd)/..
+# Resolve directory where this script resides (deploy/)
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+# Project Root is one level up
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
 echo -e "${GREEN}>>> Updating packages...${NC}"
 apt-get update
@@ -27,7 +30,8 @@ apt-get install -y nginx php-fpm php-sqlite3 php-common php-mbstring php-xml unz
 
 echo -e "${GREEN}>>> Configuring Nginx...${NC}"
 # Copy config
-cp deploy/nginx.conf /etc/nginx/sites-available/inventar
+# Copy config
+cp "$SCRIPT_DIR/nginx.conf" /etc/nginx/sites-available/inventar
 # Link new config
 ln -sf /etc/nginx/sites-available/inventar /etc/nginx/sites-enabled/
 
@@ -36,9 +40,14 @@ echo -e "${GREEN}>>> Setting up Application Directory...${NC}"
 mkdir -p $DEST_DIR
 
 # Copy files (excluding .git and deploy/setup_pi.sh itself to be safe, but cp -r is easier)
-# We assume we are running from inside 'deploy/' folder
-echo "Copying files from $CURRENT_DIR to $DEST_DIR ..."
-cp -r $CURRENT_DIR/* $DEST_DIR/
+# We copy from PROJECT_ROOT
+echo "Copying files from $PROJECT_ROOT to $DEST_DIR ..."
+# Use rsync if available for cleaner copy, else cp
+if command -v rsync &> /dev/null; then
+    rsync -av --exclude='.git' --exclude='deploy/setup_pi.sh' "$PROJECT_ROOT/" "$DEST_DIR/"
+else
+    cp -r "$PROJECT_ROOT/"* "$DEST_DIR/"
+fi
 
 echo -e "${GREEN}>>> Setting Permissions...${NC}"
 # Ensure www-data owns the directory and specifically the database
