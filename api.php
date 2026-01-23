@@ -42,6 +42,15 @@ if ($action === 'get') {
     ok(['inventory' => $inv, 'requests' => $reqs]);
 }
 
+if ($action === 'admin_inventory') {
+    Auth::requireLogin();
+    $locId = Auth::getLocationId();
+    // Return list of objects [name, qty, barcode]
+    $stmt = $pdo->prepare("SELECT name, qty, barcode FROM inventory WHERE location_id = ?");
+    $stmt->execute([$locId]);
+    ok(['inventory' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+}
+
 if ($action === 'get_by_barcode') {
     $barcode = $_GET['barcode'] ?? '';
     if (!$barcode)

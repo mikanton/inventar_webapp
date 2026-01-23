@@ -3,7 +3,7 @@ require_once __DIR__ . '/Database.php';
 
 class Auth
 {
-    const DEV_MODE = true;
+    const DEV_MODE = false;
 
     public static function startSession()
     {
