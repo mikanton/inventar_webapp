@@ -4,6 +4,10 @@ header('Cache-Control: no-cache');
 header('Connection: keep-alive');
 
 require_once __DIR__ . '/includes/Database.php';
+require_once __DIR__ . '/includes/Auth.php';
+
+// Get location from session
+$locId = Auth::getLocationId();
 
 $flag = __DIR__ . '/.sse_trigger';
 if (!file_exists($flag))
@@ -13,7 +17,9 @@ $last = filemtime($flag);
 
 // Send initial state
 $pdo = Database::connect();
-$inv = $pdo->query("SELECT name, qty FROM inventory")->fetchAll(PDO::FETCH_KEY_PAIR);
+$stmt = $pdo->prepare("SELECT name, qty FROM inventory WHERE location_id = ?");
+$stmt->execute([$locId]);
+$inv = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 echo "event: inventory\n";
 echo "data: " . json_encode($inv) . "\n\n";
 ob_flush();
@@ -27,7 +33,9 @@ while (true) {
         $last = $curr;
 
         // Send inventory update
-        $inv = $pdo->query("SELECT name, qty FROM inventory")->fetchAll(PDO::FETCH_KEY_PAIR);
+        $stmt = $pdo->prepare("SELECT name, qty FROM inventory WHERE location_id = ?");
+        $stmt->execute([$locId]);
+        $inv = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
         echo "event: inventory\n";
         echo "data: " . json_encode($inv) . "\n\n";
 

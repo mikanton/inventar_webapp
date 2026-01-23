@@ -1,17 +1,14 @@
 #!/bin/bash
-# start_local.sh
-
-# Check if PHP is installed
-if ! command -v php &> /dev/null; then
-    echo "PHP could not be found."
-    echo "Please install it using Homebrew: brew install php"
-    exit 1
+# Get local IP on Mac
+IP=$(ipconfig getifaddr en0)
+if [ -z "$IP" ]; then
+    IP="localhost"
 fi
 
-echo "Starting local server at http://localhost:8000"
-echo "Press Ctrl+C to stop."
+echo "---------------------------------------------------"
+echo "Inventar Webapp started!"
+echo "Local:   http://localhost:8000"
+echo "Network: http://$IP:8000"
+echo "---------------------------------------------------"
 
-# Start PHP built-in server
-# -S localhost:8000 : Start server on port 8000
-# -t . : Serve from current directory
-php -S localhost:8000
+php -S 0.0.0.0:8000

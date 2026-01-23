@@ -20,6 +20,9 @@ ob_start();
 
 <div id="list" class="list"></div>
 
+<script>
+    const IS_ADMIN = <?php echo Auth::isLoggedIn() || Auth::DEV_MODE ? 'true' : 'false'; ?>;
+</script>
 <script src="assets/js/scanner.js"></script>
 
 <!-- Add / Set Modal -->
@@ -90,7 +93,7 @@ $overlays = '
 <div class="fab-wrapper">
     <button id="fab" class="fab">＋</button>
 
-    <div id="fabMenu" class="fab-menu hidden" aria-hidden="true">
+    <div id="fabMenu" class="fab-menu" aria-hidden="true">
         <button class="fab-mini" id="fabAdd" title="Neuen Artikel">＋</button>
         <button class="fab-mini" id="fabScan" title="Scannen">📷</button>
         <button class="fab-mini" id="fabRequest" title="Neue Request">📦</button>

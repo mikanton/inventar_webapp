@@ -3,6 +3,8 @@ require_once __DIR__ . '/Database.php';
 
 class Auth
 {
+    const DEV_MODE = true;
+
     public static function startSession()
     {
         if (session_status() === PHP_SESSION_NONE) {
@@ -40,6 +42,16 @@ class Auth
 
     public static function requireLogin()
     {
+        if (self::DEV_MODE) {
+            self::startSession();
+            // Simulate a session if not present
+            if (!isset($_SESSION['user_id'])) {
+                $_SESSION['user_id'] = 999;
+                $_SESSION['username'] = 'Dev';
+            }
+            return;
+        }
+
         if (!self::isLoggedIn()) {
             header('Location: index.php?route=login');
             exit;
@@ -49,7 +61,18 @@ class Auth
     public static function user()
     {
         self::startSession();
+        if (self::DEV_MODE && !isset($_SESSION['username'])) {
+            return 'Dev';
+        }
         return $_SESSION['username'] ?? null;
+    }
+
+    public static function isAdmin()
+    {
+        self::startSession();
+        if (self::DEV_MODE)
+            return true;
+        return (self::user() === 'admin');
     }
 
     public static function getLocationId()

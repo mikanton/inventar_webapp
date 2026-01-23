@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/Database.php';
 require_once __DIR__ . '/includes/Auth.php';
+require_once __DIR__ . '/includes/UserManager.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -259,6 +260,9 @@ switch ($action) {
 
     case 'add':
         Auth::requireLogin();
+        if (!Auth::isAdmin() && !Auth::DEV_MODE)
+            err('Nur Admins können Artikel anlegen', 403);
+
         $name = trim($body['name'] ?? '');
         $qty = intval($body['qty'] ?? 0);
         if (!$name)
@@ -365,8 +369,13 @@ switch ($action) {
             // Check shortages
             $items = $pdo->query("SELECT name, qty FROM request_items WHERE request_id = '$id'")->fetchAll(PDO::FETCH_ASSOC);
             $shortages = [];
+            $locId = Auth::getLocationId();
+
             foreach ($items as $it) {
-                $curr = $pdo->query("SELECT qty FROM inventory WHERE name = '{$it['name']}'")->fetchColumn();
+                $stmtCheck = $pdo->prepare("SELECT qty FROM inventory WHERE name = ? AND location_id = ?");
+                $stmtCheck->execute([$it['name'], $locId]);
+                $curr = $stmtCheck->fetchColumn();
+
                 if ($curr === false)
                     $curr = 0;
                 if ($curr < $it['qty']) {
@@ -380,9 +389,9 @@ switch ($action) {
             }
 
             // Deduct
-            $stmtUpd = $pdo->prepare("UPDATE inventory SET qty = qty - ? WHERE name = ?");
+            $stmtUpd = $pdo->prepare("UPDATE inventory SET qty = qty - ? WHERE name = ? AND location_id = ?");
             foreach ($items as $it) {
-                $stmtUpd->execute([$it['qty'], $it['name']]);
+                $stmtUpd->execute([$it['qty'], $it['name'], $locId]);
             }
 
             // Update request
@@ -407,5 +416,35 @@ switch ($action) {
         log_action($pdo, 'request_delete', $id, null);
         touch_change();
         ok();
+        break;
+
+    // ---------- User Management ----------
+    case 'user_list':
+        Auth::requireLogin();
+        ok(['users' => UserManager::list()]);
+        break;
+
+    case 'user_create':
+        Auth::requireLogin();
+        $username = trim($body['username'] ?? '');
+        $password = $body['password'] ?? '';
+        if (!$username || !$password)
+            err('Missing data');
+
+        if (UserManager::create($username, $password)) {
+            ok();
+        } else {
+            err('User exists or error');
+        }
+        break;
+
+    case 'user_delete':
+        Auth::requireLogin();
+        $id = $body['id'] ?? '';
+        if (UserManager::delete($id)) {
+            ok();
+        } else {
+            err('Error');
+        }
         break;
 }

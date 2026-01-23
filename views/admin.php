@@ -2,7 +2,25 @@
 Auth::requireLogin();
 $title = 'Inventar – Admin';
 $active = 'admin';
-$extraScripts = '<script src="https://cdn.jsdelivr.net/npm/chart.js"></script><script src="assets/js/admin.js"></script>';
+$extraScripts = '<script src="https://cdn.jsdelivr.net/npm/chart.js"></script><script src="assets/js/admin.js"></script><script>const IS_ADMIN = true;</script><script src="assets/js/scanner.js"></script>';
+
+// Get Local IP
+$ip = getHostByName(getHostName());
+if ($ip == '127.0.0.1') {
+    $ip = $_SERVER['SERVER_ADDR'] ?? 'localhost';
+}
+// Check if running on HTTPS port (proxy)
+$port = 8000;
+$protocol = 'http';
+
+// If proxy.js exists, we assume the user should use the secure link
+if (file_exists(__DIR__ . '/../proxy.js')) {
+    $port = 8443;
+    $protocol = 'https';
+}
+
+$mobileUrl = "$protocol://$ip:$port";
+
 ob_start();
 ?>
 
@@ -11,6 +29,7 @@ ob_start();
     <button class="tab active btn" data-tab="inv">Inventar</button>
     <button class="tab btn" data-tab="logs">Logs</button>
     <button class="tab btn" data-tab="analytics">Analytics</button>
+    <button class="tab btn" data-tab="users">Benutzer</button>
 </nav>
 
 <!-- Inventar -->
@@ -21,11 +40,20 @@ ob_start();
                 <button id="aSortAlpha" class="seg btn active">A–Z</button>
                 <button id="aSortQty" class="seg btn">Menge</button>
             </div>
-            <div style="flex:1"></div>
+
+            <div style="flex:1; text-align: center;">
+                <small
+                    style="color: var(--text-muted); background: rgba(255,255,255,0.05); padding: 4px 8px; border-radius: 4px;">
+                    Mobile: <a href="<?php echo $mobileUrl; ?>" target="_blank"
+                        style="color: var(--primary);"><?php echo $mobileUrl; ?></a>
+                </small>
+            </div>
+
             <input id="aName" type="text" placeholder="Artikelname" style="width: auto;">
             <input id="aBarcode" type="text" placeholder="Barcode" style="width: 120px;">
             <input id="aQty" type="number" min="0" value="0" style="width: 80px;">
             <button id="aAdd" class="btn primary">Hinzufügen/Setzen</button>
+            <button class="btn" onclick="scanner.start(true)" title="Setup Scanner">📷</button>
         </div>
     </div>
     <div id="adminList" class="list"></div>

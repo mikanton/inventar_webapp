@@ -32,7 +32,7 @@ function setupListeners() {
     const fabMenu = $('#fabMenu');
     fab.addEventListener('click', () => {
         fab.classList.toggle('open');
-        fabMenu.classList.toggle('hidden');
+        // CSS handles the menu visibility via sibling selector
     });
 
     $('#fabAdd').addEventListener('click', () => {
@@ -76,7 +76,7 @@ function setupListeners() {
 }
 
 function closeFab() {
-    $('#fabMenu').classList.add('hidden');
+    // $('#fabMenu').classList.add('hidden'); // CSS handles this
     $('#fab').classList.remove('open');
 }
 
