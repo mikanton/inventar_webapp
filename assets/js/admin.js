@@ -20,14 +20,21 @@ document.addEventListener('DOMContentLoaded', () => {
 function setupTabs() {
     document.querySelectorAll('.tab').forEach(t => {
         t.addEventListener('click', () => {
+            // Remove active class from all tabs & content
             document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
             document.querySelectorAll('.tabcontent').forEach(x => x.classList.remove('active'));
-            t.classList.add('active');
-            document.getElementById('tab-' + t.dataset.tab).classList.add('active');
 
-            if (t.dataset.tab === 'logs') loadLogs();
-            if (t.dataset.tab === 'users') loadUsers();
-            if (t.dataset.tab === 'analytics') loadAnalytics();
+            // Activate clicked tab
+            t.classList.add('active');
+            const targetId = 'tab-' + t.dataset.tab;
+            const targetContent = document.getElementById(targetId);
+            if (targetContent) targetContent.classList.add('active');
+
+            // Load data based on tab
+            const tabName = t.dataset.tab;
+            if (tabName === 'logs') loadLogs();
+            if (tabName === 'users') loadUsers();
+            if (tabName === 'analytics') loadAnalytics();
         });
     });
 }
@@ -196,4 +203,67 @@ function setupSSE() {
     const ev = new EventSource('sse.php');
     ev.addEventListener('inventory', () => loadAll()); // Reload logic needs to be smarter to not kill scroll, but ok for now
     ev.addEventListener('users', () => loadUsers());
+}
+
+async function loadLogs() {
+    try {
+        const res = await fetch('api.php?action=logs');
+        const data = await res.json();
+        const tbody = $('#logsTableBody');
+        tbody.innerHTML = '';
+        (data.logs || []).forEach(log => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${new Date(log.created_at).toLocaleString()}</td>
+                <td>${log.client_id || '—'}</td>
+                <td>${log.action}</td>
+                <td>${log.item || ''} ${log.value || ''}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch (e) { console.error('Logs error', e); }
+}
+
+async function loadAnalytics() {
+    try {
+        const res = await fetch('api.php?action=analytics');
+        const data = await res.json();
+
+        // Activity Chart
+        const ctxA = document.getElementById('chartActivity');
+        if (ctxA) {
+            if (State.chartA) State.chartA.destroy();
+            State.chartA = new Chart(ctxA, {
+                type: 'line',
+                data: {
+                    labels: Object.keys(data.byDay),
+                    datasets: [{
+                        label: 'Aktionen',
+                        data: Object.values(data.byDay),
+                        borderColor: '#2a9df4',
+                        tension: 0.3
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        // Distribution Chart
+        const ctxD = document.getElementById('chartDistribution');
+        if (ctxD) {
+            if (State.chartD) State.chartD.destroy();
+            State.chartD = new Chart(ctxD, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(data.distribution),
+                    datasets: [{
+                        data: Object.values(data.distribution),
+                        backgroundColor: ['#2a9df4', '#ff7b88', '#7bd389']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+    } catch (e) { console.error('Analytics error', e); }
 }

@@ -51,6 +51,42 @@ if ($action === 'admin_inventory') {
     ok(['inventory' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
 }
 
+if ($action === 'user_list') {
+    Auth::requireLogin();
+    if (!Auth::isAdmin())
+        die(json_encode(['error' => 'Forbidden']));
+    require_once __DIR__ . '/includes/UserManager.php';
+    ok(['users' => UserManager::list()]);
+}
+
+if ($action === 'analytics') {
+    Auth::requireLogin();
+    if (!Auth::isAdmin())
+        die(json_encode(['error' => 'Forbidden']));
+
+    // Simple mock analytics for now to ensure page loads
+    // Real implementation would query logs
+    $days = [];
+    for ($i = 0; $i < 30; $i++) {
+        $days[date('Y-m-d', strtotime("-$i days"))] = rand(0, 10);
+    }
+
+    ok([
+        'byDay' => array_reverse($days),
+        'distribution' => ['A' => 10, 'B' => 20, 'C' => 5],
+        'topUsers' => ['admin' => 42],
+        'topItems' => ['Item A' => 5]
+    ]);
+}
+
+if ($action === 'logs') {
+    Auth::requireLogin();
+    if (!Auth::isAdmin())
+        die(json_encode(['error' => 'Forbidden']));
+    $logs = $pdo->query("SELECT * FROM logs ORDER BY created_at DESC LIMIT 100")->fetchAll(PDO::FETCH_ASSOC);
+    ok(['logs' => $logs]);
+}
+
 if ($action === 'get_by_barcode') {
     $barcode = $_GET['barcode'] ?? '';
     if (!$barcode)
@@ -327,7 +363,7 @@ switch ($action) {
 
     case 'add':
         Auth::requireLogin();
-        if (!Auth::isAdmin() && !Auth::DEV_MODE)
+        if (!Auth::isAdmin())
             err('Nur Admins können Artikel anlegen', 403);
 
         $name = trim($body['name'] ?? '');
