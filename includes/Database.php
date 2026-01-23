@@ -157,9 +157,6 @@ class Database
         } catch (Exception $e) {
             error_log("Barcode migration failed: " . $e->getMessage());
         }
-        } catch (Exception $e) {
-            error_log("Barcode migration failed: " . $e->getMessage());
-        }
 
         // Check for role column in users
         try {
