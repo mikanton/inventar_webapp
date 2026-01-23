@@ -43,6 +43,10 @@ while (true) {
         echo "event: logtick\n";
         echo "data: {}\n\n";
 
+        // Send Users update signal
+        echo "event: users\n";
+        echo "data: {}\n\n";
+
         ob_flush();
         flush();
     }

@@ -195,4 +195,5 @@ async function api(act, body) {
 function setupSSE() {
     const ev = new EventSource('sse.php');
     ev.addEventListener('inventory', () => loadAll()); // Reload logic needs to be smarter to not kill scroll, but ok for now
+    ev.addEventListener('users', () => loadUsers());
 }

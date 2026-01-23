@@ -1,14 +1,16 @@
 <?php
-$title = 'Login';
+$title = 'Registrieren';
 ob_start();
 ?>
 <div class="login-wrapper">
     <div class="login-card">
-        <h1>Inventar Login</h1>
+        <h1>Neuen Account erstellen</h1>
         <?php if (isset($error)): ?>
-            <div class="alert error"><?= htmlspecialchars($error) ?></div>
+            <div class="alert error">
+                <?= htmlspecialchars($error) ?>
+            </div>
         <?php endif; ?>
-        <form method="post" action="index.php?route=login">
+        <form method="post" action="index.php?route=register">
             <div class="field">
                 <label>Benutzername</label>
                 <input type="text" name="username" required autofocus>
@@ -17,9 +19,13 @@ ob_start();
                 <label>Passwort</label>
                 <input type="password" name="password" required>
             </div>
-            <button type="submit" class="btn primary full">Einloggen</button>
+            <div class="field">
+                <label>Passwort bestätigen</label>
+                <input type="password" name="password_confirm" required>
+            </div>
+            <button type="submit" class="btn primary full">Registrieren</button>
             <div style="margin-top: 15px; text-align: center;">
-                <a href="index.php?route=register" class="btn secondary full">Neuen Account erstellen</a>
+                <a href="index.php?route=login" style="color: var(--primary);">Zurück zum Login</a>
             </div>
         </form>
     </div>

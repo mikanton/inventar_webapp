@@ -43,6 +43,37 @@ $router->add('POST', 'login', function () {
   }
 });
 
+// Register
+$router->add('GET', 'register', function () use ($router) {
+  if (Auth::isLoggedIn()) {
+    header('Location: index.php');
+    exit;
+  }
+  require __DIR__ . '/views/register.php';
+});
+
+$router->add('POST', 'register', function () {
+  $username = $_POST['username'] ?? '';
+  $password = $_POST['password'] ?? '';
+  $confirm = $_POST['password_confirm'] ?? '';
+
+  if ($password !== $confirm) {
+    $error = 'Passwörter stimmen nicht überein';
+    require __DIR__ . '/views/register.php';
+    return;
+  }
+
+  require_once __DIR__ . '/includes/UserManager.php';
+  if (UserManager::create($username, $password)) {
+    // Auto login
+    Auth::login($username, $password);
+    header('Location: index.php');
+  } else {
+    $error = 'Benutzername bereits vergeben';
+    require __DIR__ . '/views/register.php';
+  }
+});
+
 // Logout
 $router->add('GET', 'logout', function () {
   Auth::logout();

@@ -1,5 +1,8 @@
 <?php
 Auth::requireLogin();
+if (!Auth::isAdmin()) {
+    die("<h1>Access Denied</h1><p>Nur für Administratoren.</p><a href='index.php'>Zurück</a>");
+}
 $title = 'Inventar – Admin';
 $active = 'admin';
 $extraScripts = '<script src="https://cdn.jsdelivr.net/npm/chart.js"></script><script src="assets/js/admin.js"></script><script>const IS_ADMIN = true;</script><script src="assets/js/scanner.js"></script>';
